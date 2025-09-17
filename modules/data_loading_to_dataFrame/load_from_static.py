@@ -17,8 +17,8 @@ def load_from_csv(file_path: str) -> DataFrame:
 
 def load_from_excel(file_path: str, sheet_name: Union[str, int]) -> DataFrame:
     """
-    Load data from *.csv format files. 
-    Attention! Data must be organized in a tabular form.
+    Load data from excel format files. 
+    
     Returns:
         pandas.DataFrame
     """

@@ -1,8 +1,5 @@
-# Core web framework
-fastapi==0.116.1
-uvicorn==0.35.0
-
 # Data validation & settings management +
+pytest==8.4.1
 pydantic==2.11.7
 pydantic-settings==2.6.1
 
@@ -27,6 +24,9 @@ autokeras==2.0.0  # Deep learning AutoML (optional, heavy)
 h2o==3.46.0.7     # H2O.ai AutoML (optional)
 
 # Additional utilities
-python-dotenv==1.1.1
 requests==2.32.5
 tqdm==4.67.1
+
+# Core web framework
+fastapi==0.116.1
+uvicorn==0.35.0
