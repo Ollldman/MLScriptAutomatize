@@ -2,11 +2,11 @@
 fastapi==0.116.1
 uvicorn==0.35.0
 
-# Data validation & settings management
-pydantic==2.11.9
-pydantic-settings==2.10.1
+# Data validation & settings management +
+pydantic==2.11.7
+pydantic-settings==2.6.1
 
-# Data manipulation & analysis
+# Data manipulation & analysis +
 pandas==2.3.2
 numpy==2.3.3
 

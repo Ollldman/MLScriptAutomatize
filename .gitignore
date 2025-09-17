@@ -93,6 +93,7 @@ poetry.lock
 venv/
 ENV/
 env/
+.conda/
 .venv/
 env.bak/
 .venv.bak/
