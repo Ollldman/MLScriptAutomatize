@@ -1,0 +1,32 @@
+# Core web framework
+fastapi==0.116.1
+uvicorn==0.35.0
+
+# Data validation & settings management
+pydantic==2.11.9
+pydantic-settings==2.10.1
+
+# Data manipulation & analysis
+pandas==2.3.2
+numpy==2.3.3
+
+# Machine Learning
+scikit-learn==1.7.2
+xgboost==3.0.5
+
+# Visualization
+matplotlib==3.10.6
+plotly==6.3.0
+
+# ML Experiment Tracking
+mlflow==3.3.2
+
+# AutoML (choose one or more)
+tpot==1.1.0  # Genetic-based AutoML
+autokeras==2.0.0  # Deep learning AutoML (optional, heavy)
+h2o==3.46.0.7     # H2O.ai AutoML (optional)
+
+# Additional utilities
+python-dotenv==1.1.1
+requests==2.32.5
+tqdm==4.67.1
