@@ -82,7 +82,7 @@ def load_from_excel(
     file_or_path: Union[str, bytes, BytesIO, Any],
     sheet_name: Union[str, int, list, None] = 0,
     **kwargs
-) -> Union[DataFrame , Dict[Union[str, int], DataFrame]]:
+) -> Union[DataFrame , Dict[Any, DataFrame]]:
     """
     Load data from Excel format from various sources:
         - local file path (str)
@@ -110,7 +110,6 @@ def load_from_excel(
 
         elif hasattr(file_or_path, 'read'):
             print('Load Excel from file-like object')
-            # pd.read_excel умеет работать с BytesIO и подобными
             return pd.read_excel(file_or_path, sheet_name=sheet_name, **kwargs)
 
         else:
