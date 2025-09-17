@@ -15,4 +15,9 @@ def test_loading_data_from_csv(app_settings: Settings):
 
 
 def test_loading_from_excel(app_settings: Settings):
-    pass
+    # Same dataset, only in excel format file
+    data: DataFrame = load_from_static.load_from_excel(
+        app_settings.TEST_DATASETS_PATH+"/movies.xlsx",
+        1
+    )
+    print(data.head(2))
