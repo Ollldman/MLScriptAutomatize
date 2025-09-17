@@ -1,5 +1,4 @@
 from pydantic_settings import BaseSettings, SettingsConfigDict
-from typing import Optional
 from dotenv import load_dotenv
 
 env_file: str = ".env"

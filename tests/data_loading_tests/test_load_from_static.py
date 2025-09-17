@@ -1,0 +1,18 @@
+from settings import Settings
+from modules.data_loading_to_dataFrame import load_from_static
+from pandas import DataFrame
+
+def test_loading_data_from_csv(app_settings: Settings):
+    # Download dataset from Kaggle
+    # Movies Dataset (TMDB) – Ratings, Popularity, Votes
+    # https://www.kaggle.com/datasets/kajaldeore04/movies-dataset-tmdb-ratings-popularity-votes
+    # and run pytest -s -v
+
+    data: DataFrame = load_from_static.load_from_csv(
+        app_settings.TEST_DATASETS_PATH+"/movies.csv")
+    
+    print(data.head(2))
+
+
+def test_loading_from_excel(app_settings: Settings):
+    pass
