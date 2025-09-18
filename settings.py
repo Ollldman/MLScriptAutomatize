@@ -13,6 +13,8 @@ class Settings(BaseSettings):
     TEST_DATASETS_PATH: str = "./datasets/"
     # Строка с данными для подключения к data base
     DB_CONNECTION: str
+    KAGGLE_USERNAME: str
+    KAGGLE_KEY: str
 
 
 settings = Settings() #type:ignore
