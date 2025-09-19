@@ -21,3 +21,10 @@
 5. Отчетность
 6. Интеграция с бизнесс-процессами
 7. Документация и тестирование.
+
+---
+---
+---
+
+
+![Codewars](https://www.codewars.com/users/Ollldman/badges/micro)
