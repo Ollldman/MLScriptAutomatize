@@ -132,5 +132,5 @@ ehthumbs_vista.db
 
 .env
 *.pdf
-
+.benchmarks/
 basket/
