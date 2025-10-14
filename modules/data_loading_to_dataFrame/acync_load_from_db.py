@@ -114,7 +114,6 @@ class AsyncSQLRunner:
                 columns = output_from_db.keys()
 
                 df: DataFrame = pd.DataFrame(rows, columns=columns) #type:ignore
-                df = df.replace({None: np.nan})
                 logger.info(f"SELECT-request is complete. Rows: {len(df)}")
                 return df
         except SQLAlchemyError as e:

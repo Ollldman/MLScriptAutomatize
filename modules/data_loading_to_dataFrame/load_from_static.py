@@ -42,7 +42,7 @@ def load_from_csv(
                 filepath_or_buffer=file_or_path,
                 encoding=encoding,
                 sep=sep,
-                **kwargs).replace(to_replace=None, value=np.nan)
+                **kwargs).replace({None: np.nan})
 
         elif isinstance(file_or_path, bytes):
             # Это сырые байты (например, из загрузчика)
@@ -52,7 +52,7 @@ def load_from_csv(
                 filepath_or_buffer=buffer, 
                 encoding=encoding, 
                 sep=sep, 
-                **kwargs).replace(to_replace=None, value=np.nan)
+                **kwargs).replace({None: np.nan})
 
         elif hasattr(file_or_path, 'read'):
             # Это файлоподобный объект (например, UploadedFile, BytesIO, StringIO)
@@ -63,14 +63,14 @@ def load_from_csv(
                     filepath_or_buffer=file_or_path,
                     encoding=encoding, 
                     sep=sep, 
-                    **kwargs).replace(to_replace=None, value=np.nan)
+                    **kwargs).replace({None: np.nan})
             else:
                 # Для StringIO или текстовых потоков
                 return pd.read_csv(
                     file_or_path, # type: ignore
                     encoding=encoding,
                     sep=sep,
-                    **kwargs).replace(to_replace=None, value=np.nan)
+                    **kwargs).replace({None: np.nan})
 
         else:
             raise ValueError(f"Unsupported file_or_path type: {type(file_or_path)}")
