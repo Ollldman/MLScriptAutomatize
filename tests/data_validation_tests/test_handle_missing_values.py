@@ -1,4 +1,3 @@
-# test_handle_missing_values.py
 import pytest
 import pandas as pd
 import numpy as np
@@ -15,8 +14,8 @@ def sample_df():
     return pd.DataFrame({
         'num1': [1.0, 2.0, np.nan, 4.0],
         'num2': [10, np.nan, 30, 40],
-        'cat1': ['A', None, 'C', 'A'],
-        'cat2': [None, 'X', 'Y', None]
+        'cat1': ['A', np.nan, 'C', 'A'],
+        'cat2': [np.nan, 'X', 'Y', np.nan]
     })
 
 
@@ -27,15 +26,15 @@ def test_handle_missing_numeric_values_mean(sample_df):
     assert result.loc[1, 'num2'] == pytest.approx((10 + 30 + 40) / 3)
 
 
-# def test_handle_missing_categorical_values_most_frequent(sample_df):
-#     result = handle_missing_categorical_values(
-#         sample_df, 
-#         strategy="constant", 
-#         fill_value='A')
-#     assert not result[['cat1', 'cat2']].isnull().any().any()
-#     assert result.loc[1, 'cat1'] == 'A'  # 'A' is most frequent
-#     # For cat2: 'X' and 'Y' appear once → sklearn picks first encountered
-#     assert result.loc[0, 'cat2'] in ['X', 'Y']
+def test_handle_missing_categorical_values_most_frequent(sample_df):
+    result = handle_missing_categorical_values(
+        sample_df, 
+        strategy="constant", 
+        fill_value='A')
+    assert not result[['cat1', 'cat2']].isnull().any().any()
+    assert result.loc[1, 'cat1'] == 'A'  # 'A' is most frequent
+    # For cat2: 'X' and 'Y' appear once → sklearn picks first encountered
+    assert result.loc[0, 'cat2'] in ['A','X', 'Y']
 
 
 def test_check_dataset_reports_both_types(sample_df):
@@ -52,15 +51,15 @@ def test_check_dataset_no_missing():
     assert report == "No missing values detected."
 
 
-# def test_handle_missing_values_high_level_both_strategies(sample_df):
-#     result = handle_missing_values(
-#         sample_df,
-#         numeric_strategy="median",
-#         categorical_strategy="most_frequent"
-#     )
-#     assert result.isnull().sum().sum() == 0
-#     assert result.loc[2, 'num1'] == 2.0
-#     assert result.loc[1, 'cat1'] == 'A'
+def test_handle_missing_values_high_level_both_strategies(sample_df):
+    result = handle_missing_values(
+        sample_df,
+        numeric_strategy="median",
+        categorical_strategy="most_frequent"
+    )
+    assert result.isnull().sum().sum() == 0
+    assert result.loc[2, 'num1'] == 2.0
+    assert result.loc[1, 'cat1'] == 'A'
 
 
 def test_handle_missing_values_only_numeric(sample_df):
@@ -71,14 +70,14 @@ def test_handle_missing_values_only_numeric(sample_df):
     assert not result[['num1', 'num2']].isnull().any().any()
 
 
-# def test_handle_missing_values_only_categorical(sample_df):
-#     result = handle_missing_values(sample_df, categorical_strategy="constant", categorical_fill_value="MISSING")
-#     # Numeric columns unchanged
-#     assert result['num1'].isnull().sum() == 1
-#     assert result['num2'].isnull().sum() == 1
-#     # Categorical filled
-#     assert result.loc[0, 'cat2'] == "MISSING"
-#     assert result.loc[3, 'cat2'] == "MISSING"
+def test_handle_missing_values_only_categorical(sample_df):
+    result = handle_missing_values(sample_df, categorical_strategy="constant", categorical_fill_value="MISSING")
+    # Numeric columns unchanged
+    assert result['num1'].isnull().sum() == 1
+    assert result['num2'].isnull().sum() == 1
+    # Categorical filled
+    assert result.loc[0, 'cat2'] == "MISSING"
+    assert result.loc[3, 'cat2'] == "MISSING"
 
 
 def test_handle_missing_numeric_values_constant_requires_fill_value():

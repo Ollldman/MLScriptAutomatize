@@ -1,6 +1,7 @@
 import logging
 import sqlparse
 import pandas as pd
+import numpy as np
 from pandas import DataFrame
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncEngine
 from sqlalchemy import text
@@ -113,6 +114,7 @@ class AsyncSQLRunner:
                 columns = output_from_db.keys()
 
                 df: DataFrame = pd.DataFrame(rows, columns=columns) #type:ignore
+                df = df.replace({None: np.nan})
                 logger.info(f"SELECT-request is complete. Rows: {len(df)}")
                 return df
         except SQLAlchemyError as e:
@@ -145,6 +147,7 @@ async def async_sql_to_df(
         return None
     df: Optional[DataFrame] = await executor.query_to_dataframe(sql, params)
     await executor.close()
+    
     return df
 
 AsyncDB = AsyncSQLRunner

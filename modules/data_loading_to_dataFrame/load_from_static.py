@@ -1,4 +1,5 @@
 import pandas as pd
+import numpy as np
 from pandas import DataFrame
 from typing import BinaryIO, TextIO, Union, Any, Dict
 from io import BytesIO, StringIO
@@ -41,7 +42,7 @@ def load_from_csv(
                 filepath_or_buffer=file_or_path,
                 encoding=encoding,
                 sep=sep,
-                **kwargs)
+                **kwargs).replace(to_replace=None, value=np.nan)
 
         elif isinstance(file_or_path, bytes):
             # Это сырые байты (например, из загрузчика)
@@ -51,7 +52,7 @@ def load_from_csv(
                 filepath_or_buffer=buffer, 
                 encoding=encoding, 
                 sep=sep, 
-                **kwargs)
+                **kwargs).replace(to_replace=None, value=np.nan)
 
         elif hasattr(file_or_path, 'read'):
             # Это файлоподобный объект (например, UploadedFile, BytesIO, StringIO)
@@ -62,14 +63,14 @@ def load_from_csv(
                     filepath_or_buffer=file_or_path,
                     encoding=encoding, 
                     sep=sep, 
-                    **kwargs)
+                    **kwargs).replace(to_replace=None, value=np.nan)
             else:
                 # Для StringIO или текстовых потоков
                 return pd.read_csv(
                     file_or_path, # type: ignore
                     encoding=encoding,
                     sep=sep,
-                    **kwargs)
+                    **kwargs).replace(to_replace=None, value=np.nan)
 
         else:
             raise ValueError(f"Unsupported file_or_path type: {type(file_or_path)}")
@@ -101,7 +102,9 @@ def load_from_excel(
     try:
         if isinstance(file_or_path, str):
             print(f'Load Excel file from path: {file_or_path}, sheet: {sheet_name}')
-            return pd.read_excel(file_or_path, sheet_name=sheet_name, **kwargs)
+            return pd.read_excel(file_or_path,
+                                sheet_name=sheet_name,
+                                **kwargs)
 
         elif isinstance(file_or_path, bytes):
             print('Load Excel from bytes')

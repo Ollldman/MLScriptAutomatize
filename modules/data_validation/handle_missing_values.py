@@ -143,9 +143,7 @@ def handle_missing_categorical_values(
         imputer = SimpleImputer(strategy="most_frequent")
 
     # sklearn returns object dtype; preserve as string if possible
-    print(f'\n \n {cols_to_process} \n\n')
     df_out[cols_to_process] = imputer.fit_transform(df_out[cols_to_process])
-    print(f'\n \n{df_out}\n\n')
     missing_after = df_out[cols_to_process].isnull().sum().sum()
     logger.info(f"Missing values after imputation in categorical columns: {missing_after}")
     return df_out

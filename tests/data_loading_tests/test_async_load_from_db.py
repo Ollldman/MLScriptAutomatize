@@ -5,6 +5,7 @@ from modules.data_loading_to_dataFrame.acync_load_from_db import (
     AsyncSQLRunner,
     AsyncDB)
 from pandas import DataFrame
+import numpy as np
 from typing import AsyncGenerator,Optional
 import pytest
 import pytest_asyncio
@@ -61,7 +62,7 @@ async def executor(app_settings: Settings)-> AsyncGenerator[AsyncSQLRunner, None
 @pytest.mark.asyncio
 async def test_select_query_works(executor: AsyncSQLRunner):
     df = await executor.query_to_dataframe(SQL_QUERY_1)
-    assert df is not None
+    assert df is not np.nan
     assert not df.empty
     assert "model" in df.columns
 

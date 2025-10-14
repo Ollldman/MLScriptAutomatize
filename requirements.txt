@@ -16,6 +16,7 @@ kagglehub==0.3.13
 datasets==4.1.1
 asyncpg==0.30.0  # Async work with postgreSQL
 asyncio==4.0.0
+ucimlrepo==0.0.7
 
 # Machine Learning
 scikit-learn==1.7.1 # +

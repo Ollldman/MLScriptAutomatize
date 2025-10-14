@@ -1,4 +1,5 @@
 import pandas as pd
+import numpy as np
 import logging
 from typing import Any, Dict, Optional, Union
 import os
@@ -13,6 +14,7 @@ import kagglehub
 from kagglehub import KaggleDatasetAdapter
 from datasets import load_dataset as hf_load_dataset
 from sklearn import datasets as sklearn_datasets
+from ucimlrepo import fetch_ucirepo 
 import requests
 from io import StringIO, BytesIO
 
@@ -49,6 +51,7 @@ def load_from_kaggle(dataset_id: str, filename: str, **kwargs) -> Optional[pd.Da
             filename,
             pandas_kwargs=kwargs
         )
+        data = data.replace({None : np.nan})
         return data
 
     except Exception as e:
@@ -72,7 +75,8 @@ def load_from_huggingface(dataset_id: str, config_name: Optional[str] = None,
     try:
         logger.info(f"🤗 Загрузка датасета с Hugging Face: {dataset_id}, split={split}")
         dataset = hf_load_dataset(dataset_id, config_name, split=split)
-        df = dataset.to_pandas()
+        df = dataset.to_pandas() #type:ignore
+        df = df.replace({None : np.nan}) #type:ignore
         logger.info(f"Загружено {len(df)} строк")
         return df
     except Exception as e:
@@ -80,7 +84,7 @@ def load_from_huggingface(dataset_id: str, config_name: Optional[str] = None,
         return None
 
 
-def load_from_uci(url: str, **kwargs) -> Optional[pd.DataFrame]:
+def load_from_uci(dataset_id: int, **kwargs) -> Optional[pd.DataFrame]:
     """
     Загружает датасет с UCI Machine Learning Repository.
 
@@ -88,13 +92,21 @@ def load_from_uci(url: str, **kwargs) -> Optional[pd.DataFrame]:
     :return: pd.DataFrame или None
     """
     try:
-        logger.info(f"🌐 Загрузка с UCI: {url}")
-        response = requests.get(url)
-        response.raise_for_status()
+        logger.info(f"🌐 Загрузка с UCI, dataset_id: {dataset_id}")
+        # response = requests.get(url)
+        # response.raise_for_status()
 
-        # Попробуем как CSV
-        content = StringIO(response.text)
-        df = pd.read_csv(content, **kwargs)
+        # # Попробуем как CSV
+        # content = StringIO(response.text)
+        # df = pd.read_csv(content, **kwargs)
+        # df = df.replace({None : np.nan})
+        # fetch dataset 
+        object_data = fetch_ucirepo(id=dataset_id) 
+        
+        # data (as pandas dataframes) 
+        X = object_data.data.features #type:ignore
+        y = object_data.data.targets  #type:ignore
+        df = pd.concat([X, y], axis=1)
         logger.info(f"Загружено {len(df)} строк")
         return df
     except Exception as e:
@@ -109,10 +121,6 @@ def load_from_sklearn(name: str, **kwargs) -> Optional[pd.DataFrame]:
     :param name: Имя функции, например, "load_iris", "load_boston", "fetch_california_housing"
     :return: pd.DataFrame или None
     """
-    if not SKLEARN_AVAILABLE:
-        logger.error("sklearn не установлен.")
-        return None
-
     try:
         if not hasattr(sklearn_datasets, name):
             logger.error(f"Датасет '{name}' не найден в sklearn.datasets")
@@ -132,6 +140,7 @@ def load_from_sklearn(name: str, **kwargs) -> Optional[pd.DataFrame]:
                 df[target_name] = data.target
 
         logger.info(f"Загружено {len(df)} строк")
+        df = df.replace({None : np.nan})
         return df
     except Exception as e:
         logger.error(f"Ошибка при загрузке из sklearn: {e}")
