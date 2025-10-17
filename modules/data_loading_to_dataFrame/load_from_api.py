@@ -88,7 +88,7 @@ def load_from_uci(dataset_id: int, **kwargs) -> Optional[pd.DataFrame]:
     """
     Загружает датасет с UCI Machine Learning Repository.
 
-    :param url: Прямая ссылка на .data или .csv файл
+    :dataset_id: ID набора данных на uci
     :return: pd.DataFrame или None
     """
     try:
@@ -158,13 +158,13 @@ def load_dataset(source: str, **kwargs) -> Optional[pd.DataFrame]:
     Поддерживаемые источники:
       - 'kaggle': dataset_id, filename
       - 'huggingface': dataset_id, config_name, split
-      - 'uci': url
+      - 'uci': dataset_id
       - 'sklearn': name
 
     Примеры:
       load_dataset('kaggle', dataset_id='zynicide/wine-reviews', filename='winemag-data_first150k.csv')
       load_dataset('huggingface', dataset_id='imdb', split='test')
-      load_dataset('uci', url='https://archive.ics.uci.edu/ml/machine-learning-databases/iris/iris.data')
+      load_dataset('uci', dataset_id=186)
       load_dataset('sklearn', name='load_iris')
     """
     loaders = {

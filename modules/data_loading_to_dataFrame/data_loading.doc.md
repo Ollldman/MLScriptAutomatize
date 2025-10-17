@@ -64,7 +64,7 @@
 
 Загружает датасет с UCI Machine Learning Repository.
 
-    :param url: Прямая ссылка на .data или .csv файл
+    :dataset_id: ID набора данных на uci
     :return: pd.DataFrame или None
 
 - `def load_from_sklearn(...)`
