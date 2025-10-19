@@ -1,0 +1,45 @@
+[project]
+name = "mlscriptautomatize"
+version = "0.1.0"
+description = "project to automatization ml"
+authors = [
+    {name = "Ollldman",email = "dodrolla@gmail.com"}
+]
+readme = "README.md"
+requires-python = "3.13.7"
+dependencies = [
+    "pytest (==8.4.1)",
+    "pytest-asyncio (==1.2.0)",
+    "pytest-benchmark (==5.1.0)",
+    "pydantic (==2.11.7)",
+    "pydantic-settings (==2.6.1)",
+    "pandas (==2.3.2)",
+    "openpyxl (==3.1.5)",
+    "numpy (==2.3.3)",
+    "psycopg2 (==2.9.10)",
+    "sqlalchemy (==2.0.43)",
+    "sqlparse (==0.5.2)",
+    "kagglehub (==0.3.13)",
+    "datasets (==4.1.1)",
+    "asyncpg (==0.30.0)",
+    "asyncio (==4.0.0)",
+    "ucimlrepo (==0.0.7)",
+    "scikit-learn (==1.7.1)",
+    "xgboost (==3.0.5)",
+    "matplotlib (==3.10.6)",
+    "plotly (==6.3.0)",
+    "mlflow (==3.3.2)",
+    "tpot (==1.1.0)",
+    "autokeras (==2.0.0)",
+    "h2o (==3.46.0.7)",
+    "requests (==2.32.5)",
+    "tqdm (==4.67.1)",
+    "fastapi (==0.116.1)",
+    "uvicorn (==0.35.0)"
+
+]
+
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"

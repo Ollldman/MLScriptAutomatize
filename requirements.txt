@@ -4,7 +4,6 @@ pytest-asyncio==1.2.0
 pytest-benchmark==5.1.0 
 pydantic==2.11.7
 pydantic-settings==2.6.1
-
 # Data manipulation & analysis & loading +
 pandas==2.3.2
 openpyxl==3.1.5
@@ -17,27 +16,21 @@ datasets==4.1.1
 asyncpg==0.30.0  # Async work with postgreSQL
 asyncio==4.0.0
 ucimlrepo==0.0.7
-
 # Machine Learning
 scikit-learn==1.7.1 # +
 xgboost==3.0.5
-
 # Visualization
 matplotlib==3.10.6
 plotly==6.3.0
-
 # ML Experiment Tracking
 mlflow==3.3.2
-
 # AutoML (choose one or more)
 tpot==1.1.0  # Genetic-based AutoML
 autokeras==2.0.0  # Deep learning AutoML (optional, heavy)
 h2o==3.46.0.7     # H2O.ai AutoML (optional)
-
 # Additional utilities
 requests==2.32.5
 tqdm==4.67.1
-
 # Core web framework
 fastapi==0.116.1
 uvicorn==0.35.0
