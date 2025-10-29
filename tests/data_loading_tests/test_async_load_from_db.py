@@ -24,17 +24,17 @@ Tests:
 4. Test warning requests
 etc.
 """
-SQL_QUERY_1: str = "SELECT * FROM aircrafts LIMIT 2;"
+SQL_QUERY_1: str = "SELECT * FROM airplanes_data LIMIT 2;"
 SQL_QUERY_2: str = "SELECT * FROM bookings LIMIT :x;"
-SQL_QUERY_3: str = "SELECT * FROM airports LIMIT 2;"
-SQL_QUERY_4: str = "ALTER TABLE aircrafts ADD COLUMN construction text;"
-SQL_QUERY_5: str = "DELETE FROM aircrafts WHERE aircraft_code = '773';"
+SQL_QUERY_3: str = "SELECT * FROM airports_data LIMIT 2;"
+SQL_QUERY_4: str = "ALTER TABLE airplanes_data ADD COLUMN construction text;"
+SQL_QUERY_5: str = "DELETE FROM airplanes_data WHERE airplane_code = '339';"
 SQL_QUERY_6: str = "This is not a SQL!!!"
 
 
 QUERIES = [
-    "SELECT * FROM aircrafts LIMIT 10;",
-    "SELECT * FROM airports LIMIT 10;",
+    "SELECT * FROM seats LIMIT 10;",
+    "SELECT * FROM airports_data LIMIT 10;",
     "SELECT * FROM bookings LIMIT 10;",
     "SELECT * FROM tickets LIMIT 10;",
     "SELECT * FROM flights LIMIT 10;",
@@ -94,7 +94,7 @@ async def test_delete_rejected(executor: AsyncSQLRunner):
     assert df is None
     # check
     df = await executor.query_to_dataframe(
-        "SELECT * FROM aircrafts WHERE aircraft_code = '773';")
+        "SELECT * FROM airplanes_data WHERE airplane_code = '789';")
     assert df is not None
 
 @pytest.mark.asyncio
@@ -113,7 +113,7 @@ async def test_sql_to_df_function_select_only(app_settings: Settings):
         app_settings.AIO_DB_CONNECTION, 
         SQL_QUERY_1)
     assert df is not None
-    assert df.iloc[0]['range'] == 11100
+    assert df.iloc[0]['range'] == 6500
 
     # Проверка блокировки через функцию
     df2 = await async_sql_to_df(
