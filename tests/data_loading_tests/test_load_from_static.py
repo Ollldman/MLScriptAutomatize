@@ -11,7 +11,7 @@ def test_loading_data_from_dynamic_csv(app_settings: Settings):
     # and run pytest -s -v
 
     data: DataFrame = load_from_static.load_from_csv(
-        app_settings.TEST_DATASETS_PATH+"/movies.csv")
+        app_settings.TEST_DATASETS_PATH+"diabetes.csv")
     
     print(data.head(2))
 
@@ -19,7 +19,7 @@ def test_loading_data_from_dynamic_csv(app_settings: Settings):
 def test_loading_from_dynamic_excel(app_settings: Settings):
     # Same dataset, only in excel format file
     data: Union[DataFrame, dict] = load_from_static.load_from_excel(
-        app_settings.TEST_DATASETS_PATH+"/movies.xlsx"
+        app_settings.TEST_DATASETS_PATH+"diabetes.xlsx"
     )
     if isinstance(data, DataFrame):
         print(data.head(2))
