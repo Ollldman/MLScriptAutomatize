@@ -1,7 +1,7 @@
 [project]
-name = "mlscriptautomatize"
+name = "ModelForge"
 version = "0.1.0"
-description = "project to automatization ml"
+description = "project for ml"
 authors = [
     {name = "Ollldman",email = "dodrolla@gmail.com"}
 ]
