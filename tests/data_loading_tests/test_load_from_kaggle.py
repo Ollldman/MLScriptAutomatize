@@ -1,4 +1,4 @@
-from modules.data_loading_to_dataFrame.load_from_api import (
+from ModelForge.modules.data_loading_to_dataFrame.load_from_api import (
     load_from_kaggle,
     load_from_uci)
 from pandas import DataFrame

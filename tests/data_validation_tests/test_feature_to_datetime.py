@@ -1,7 +1,7 @@
 # test_datetime_conversion.py
 import pytest
 import pandas as pd
-from modules.data_validation.feature_to_datetime import convert_column_to_datetime
+from ModelForge.modules.data_validation.feature_to_datetime import convert_column_to_datetime
 
 
 @pytest.fixture

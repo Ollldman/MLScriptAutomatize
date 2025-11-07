@@ -1,7 +1,7 @@
 import pytest
 import pandas as pd
 import numpy as np
-from modules.data_validation.handle_missing_values import (
+from ModelForge.modules.data_validation.handle_missing_values import (
     handle_missing_numeric_values,
     handle_missing_categorical_values,
     check_dataset,

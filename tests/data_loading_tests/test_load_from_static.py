@@ -1,6 +1,6 @@
 from typing import Union
-from modules.data_loading_to_dataFrame import load_from_static
-from settings import Settings
+from ModelForge.modules.data_loading_to_dataFrame import load_from_static
+from ModelForge.settings import Settings
 from pandas import DataFrame
 
 

@@ -3,7 +3,7 @@ import numpy as np
 import logging
 from typing import Any, Dict, Optional, Union
 import os
-from settings import settings
+from ModelForge.settings import settings
 
 # Логирование
 logging.basicConfig(level=logging.INFO)

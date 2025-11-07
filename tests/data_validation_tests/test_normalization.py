@@ -2,7 +2,7 @@
 import pytest
 import pandas as pd
 import numpy as np
-from modules.data_validation.normalize_numerical_columns import normalize_numerical_columns
+from ModelForge.modules.data_validation.normalize_numerical_columns import normalize_numerical_columns
 
 
 @pytest.fixture

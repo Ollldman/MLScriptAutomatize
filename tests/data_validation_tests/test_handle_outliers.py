@@ -2,8 +2,8 @@
 import pytest
 import pandas as pd
 import numpy as np
-from modules.data_validation.handle_outliers import handle_outliers
-from modules.data_loading_to_dataFrame.load_from_api import load_from_sklearn
+from ModelForge.modules.data_validation.handle_outliers import handle_outliers
+from ModelForge.modules.data_loading_to_dataFrame.load_from_api import load_from_sklearn
 
 california_df: pd.DataFrame | None = load_from_sklearn('fetch_california_housing')
 

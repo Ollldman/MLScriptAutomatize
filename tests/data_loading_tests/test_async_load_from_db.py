@@ -1,6 +1,6 @@
 import asyncio
-from settings import Settings
-from modules.data_loading_to_dataFrame.acync_load_from_db import (
+from ModelForge.settings import Settings
+from ModelForge.modules.data_loading_to_dataFrame.acync_load_from_db import (
     async_sql_to_df,
     AsyncSQLRunner,
     AsyncDB)
@@ -62,10 +62,9 @@ async def executor(app_settings: Settings)-> AsyncGenerator[AsyncSQLRunner, None
 @pytest.mark.asyncio
 async def test_select_query_works(executor: AsyncSQLRunner):
     df = await executor.query_to_dataframe(SQL_QUERY_1)
-    if df:
-        assert df is not np.nan
-        assert not df.empty
-        assert "model" in df.columns
+    assert df is not np.nan
+    assert not df.empty # type:ignore
+    assert "model" in df.columns # type:ignore
 
 @pytest.mark.asyncio
 async def test_parametrized_select_works(executor: AsyncSQLRunner):

@@ -1,7 +1,7 @@
 import pytest
 import pandas as pd
 import numpy as np
-from modules.data_validation.feature_encoding import encode_categorical_column, apply_one_hot_encoding, apply_label_encoding
+from ModelForge.modules.data_validation.feature_encoding import encode_categorical_column, apply_one_hot_encoding, apply_label_encoding
 
 
 @pytest.fixture

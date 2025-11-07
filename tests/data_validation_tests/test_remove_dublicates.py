@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 import pytest
 
-from modules.data_validation.remove_dublicate_rows import (
+from ModelForge.modules.data_validation.remove_dublicate_rows import (
     remove_duplicate_rows,
     DeduplicationResult)
 

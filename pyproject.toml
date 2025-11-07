@@ -3,7 +3,7 @@ name = "ModelForge"
 version = "0.1.0"
 description = "project for ml"
 authors = [
-    {name = "Ollldman",email = "dodrolla@gmail.com"}
+    {name = "Daniil Preobrazhenskii",email = "dodrolla@gmail.com"}
 ]
 readme = "README.md"
 requires-python = "3.13.7"
@@ -40,7 +40,26 @@ dependencies = [
     "jupyter (>=1.1.1,<2.0.0)"
 ]
 
+[tool.poetry]
+packages = [
+    { include = "ModelForge"}
+]
 
 [build-system]
 requires = ["poetry-core>=2.0.0,<3.0.0"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+addopts = [
+    "--verbose",
+    "--tb=short",
+    "--strict-config",
+    "--strict-markers"
+]
+markers = [
+    "slow: marks tests as slow (deselect with '-m \"not slow\"')",
+    "integration: marks tests as integration tests",
+    "unit: marks tests as unit tests"
+]
