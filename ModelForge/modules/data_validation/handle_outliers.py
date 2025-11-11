@@ -10,7 +10,7 @@ def handle_outliers(
     df: pd.DataFrame,
     column: Union[str, int],
     method: Literal["iqr", "zscore"] = "iqr",
-    handling: Literal["remove", "clip", "impute"] = "clip",
+    handling: Literal["remove", "clip", "impute"] = "remove",
     impute_strategy: Literal["mean", "median"] = "median",
     threshold: float = 1.5,
     z_threshold: float = 3.0,
