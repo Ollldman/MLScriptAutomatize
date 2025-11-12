@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field, ValidationError, field_validator
+from pydantic import BaseModel, Field, ValidationError, field_validator, ConfigDict
 from typing import Literal, Optional, Dict, Any
 from datetime import datetime
 import logging
@@ -12,6 +12,7 @@ class ReportData(BaseModel):
     Pydantic model for validating report generation data following CRISP-DM structure.
     All fields are optional to allow incremental filling.
     """
+    model_config = ConfigDict(extra="allow", validate_assignment=True)
     project_name: Optional[str] = "AutoML Experiment"
     timestamp: Optional[str] = Field(default_factory=lambda: datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
 
@@ -33,11 +34,6 @@ class ReportData(BaseModel):
     # 6. Deployment / Recommendations
     deployment: Optional[Dict[str, str]] = None  # e.g. {"recommendations": str}
 
-    class Config:
-        # Allow extra fields if needed in the future
-        extra = "allow"
-        # Ensure validation on assignment
-        validate_assignment = True
 
     def is_complete(self) -> bool:
         """

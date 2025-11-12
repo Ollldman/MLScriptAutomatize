@@ -13,6 +13,7 @@ class Settings(BaseSettings):
     TEST_DATASETS_PATH: str = "./datasets/"
     # Строка с данными для подключения к data base
     DB_CONNECTION: str
+    DB_FOR_MODELS: str
     AIO_DB_CONNECTION: str
     # Авторизация в KAGGLE
     KAGGLE_USERNAME: str

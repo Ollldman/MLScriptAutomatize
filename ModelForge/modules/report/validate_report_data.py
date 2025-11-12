@@ -2,7 +2,7 @@ from typing import Dict, Tuple, Union, Any, Optional
 import logging
 from pydantic import ValidationError, field_validator
 
-from report.report_data import ReportData
+from ModelForge.modules.report.report_data import ReportData
 
 logger = logging.getLogger(__name__)
 

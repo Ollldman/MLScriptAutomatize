@@ -88,16 +88,16 @@ def handle_outliers(
         df_out = df_out[~outlier_mask].copy()
         logger.info(f"Removed {n_outliers} rows containing outliers.")
 
-    # elif handling == "clip":
-    #     if method == "iqr":
-    #         df_out[col_name] = series.clip(lower=lower_bound, upper=upper_bound)
-    #         print('we are here')
-    #     else:  # zscore → use percentiles matching z=±3 (~99.7%)
-    #         lower_clip = series.quantile(0.0015)
-    #         upper_clip = series.quantile(0.9985)
-    #         df_out[col_name] = series.clip(lower=lower_clip, upper=upper_clip)
-    #         print('Ormwe are here')
-    #     logger.info(f"Clipped {n_outliers} outliers to boundary values.")
+    elif handling == "clip":
+        if method == "iqr":
+            df_out[col_name] = series.clip(lower=lower_bound, upper=upper_bound)
+            print('we are here')
+        else:  # zscore → use percentiles matching z=±3 (~99.7%)
+            lower_clip = series.quantile(0.0015)
+            upper_clip = series.quantile(0.9985)
+            df_out[col_name] = series.clip(lower=lower_clip, upper=upper_clip)
+            print('Ormwe are here')
+        logger.info(f"Clipped {n_outliers} outliers to boundary values.")
 
     elif handling == "impute":
         non_outlier_values = series[~outlier_mask]
