@@ -1,3 +1,4 @@
+# UI/ui_main_window.py
 from PyQt5.QtWidgets import (
     QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QLabel, QPushButton,
     QStackedWidget, QFrame, QSizePolicy
@@ -23,18 +24,27 @@ class MainWindow(QMainWindow):
         self.setGeometry(100, 100, 1000, 700)
         self.setMinimumSize(800, 600)
 
+        # ✅ Устанавливаем стеклянный фон только для этого окна, если нужно
+        # self.setAttribute(Qt.WA_TranslucentBackground, True)  # ❌ Убрали — вызывает CSS-предупреждения
+
         # Центральный виджет
         central_widget = QWidget()
         self.setCentralWidget(central_widget)
         main_layout = QVBoxLayout(central_widget)
-        main_layout.setContentsMargins(0, 0, 0, 0)
-        main_layout.setSpacing(0)
+        main_layout.setContentsMargins(20, 20, 20, 20)  # Отступы от краёв
+        main_layout.setSpacing(10)
 
         # Заголовок
         title_label = QLabel("📊 ModelForge — Автоматизированный ML-анализ")
-        title_label.setAlignment(Qt.AlignCenter)
+        title_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         title_label.setFont(QFont("Segoe UI", 18, QFont.Bold))
-        title_label.setStyleSheet("color: #1e1e1e; padding: 20px; background-color: rgba(255,255,255,0.9); border-radius: 12px; margin: 0;")
+        title_label.setStyleSheet("""
+            color: #f0f0f0;
+            padding: 20px;
+            background-color: rgba(50, 50, 60, 180);
+            border-radius: 12px;
+            margin: 0;
+        """)
         main_layout.addWidget(title_label)
 
         # Горизонтальный контейнер для навигации и контента
@@ -44,7 +54,11 @@ class MainWindow(QMainWindow):
         # Боковая панель навигации
         nav_frame = QFrame()
         nav_frame.setFixedWidth(220)
-        nav_frame.setStyleSheet("background-color: rgba(255,255,255,0.85); border-right: 1px solid rgba(200,200,200,0.5); border-radius: 0 12px 12px 0;")
+        nav_frame.setStyleSheet("""
+            background-color: rgba(40, 40, 50, 180);
+            border-right: 1px solid rgba(100, 100, 120, 0.5);
+            border-radius: 0 12px 12px 0;
+        """)
         nav_layout = QVBoxLayout(nav_frame)
         nav_layout.setSpacing(8)
         nav_layout.setContentsMargins(15, 20, 15, 20)
@@ -72,7 +86,10 @@ class MainWindow(QMainWindow):
 
         # Стек для содержимого шагов
         self.stacked_widget = QStackedWidget()
-        self.stacked_widget.setStyleSheet("background: transparent;")
+        self.stacked_widget.setStyleSheet("""
+            background: transparent;
+            border-radius: 12px;
+        """)
 
         # Создаем экземпляры шагов
         self.steps = {}
@@ -99,7 +116,7 @@ class MainWindow(QMainWindow):
             margin: 10px;
         """)
         save_btn.clicked.connect(self.on_save_report)
-        main_layout.addWidget(save_btn, alignment=Qt.AlignCenter)
+        main_layout.addWidget(save_btn, alignment=Qt.AlignmentFlag.AlignCenter)
 
     def on_nav_click(self, step_name):
         """Обработчик клика по кнопке навигации."""
@@ -130,11 +147,6 @@ class MainWindow(QMainWindow):
 
     def on_save_report(self):
         """Открывает диалог сохранения отчёта."""
-        from PyQt5.QtWidgets import QFileDialog
-        from PyQt5.QtCore import QUrl
-        import os
-
-        # Пока заглушка — просто выводим сообщение
         from PyQt5.QtWidgets import QMessageBox
         QMessageBox.information(
             self,
@@ -144,5 +156,3 @@ class MainWindow(QMainWindow):
             "Выберите папку для сохранения HTML и PDF файлов.",
             QMessageBox.Ok
         )
-
-        # В будущем: вызов generate_automl_report из ModelForge.modules.report.report_generator
