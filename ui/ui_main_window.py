@@ -53,7 +53,7 @@ class MainWindow(QMainWindow):
 
         # Боковая панель навигации
         nav_frame = QFrame()
-        nav_frame.setFixedWidth(220)
+        nav_frame.setFixedWidth(310)
         nav_frame.setStyleSheet("""
             background-color: rgba(40, 40, 50, 180);
             border-right: 1px solid rgba(100, 100, 120, 0.5);
