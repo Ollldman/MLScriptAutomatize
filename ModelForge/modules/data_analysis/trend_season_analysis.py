@@ -1,4 +1,3 @@
-# data_analysis/trend_season_analysis.py
 import logging
 from typing import Dict, Any, Optional, Union
 import pandas as pd
@@ -120,7 +119,7 @@ def analyze_time_series(
     seasonality_strength = 0.0
 
     try:
-        decomp = seasonal_decompose(series, model=model, extrapolate_trend="freq")
+        decomp = seasonal_decompose(series, model=model, extrapolate_trend='freq') # type:ignore
         decomposition = {
             "trend": decomp.trend.dropna().tolist(),
             "seasonal": decomp.seasonal.dropna().tolist(),

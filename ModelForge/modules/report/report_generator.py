@@ -3,10 +3,14 @@ import logging
 import os
 import json
 from typing import Dict, Any, Optional, List
+from git import Repo
 import pandas as pd
 from jinja2 import Template
 from xhtml2pdf import pisa
 from datetime import datetime
+from ModelForge.settings import settings
+from report.report_data import ReportData
+from report.validate_report_data import validate_report_data
 
 logger = logging.getLogger(__name__)
 
@@ -125,10 +129,10 @@ logger = logging.getLogger(__name__)
 
 def generate_automl_report(
     results: Dict[str, Any],
-    output_dir: str,
+    output_dir: str = settings.reports_dir,
     project_name: str = "AutoML Experiment",
     save_pdf: bool = True,
-) -> str:
+) -> Optional[str]:
     """
     Generate a CRISP-DM compliant HTML report (with optional PDF) from pipeline results.
 
@@ -153,30 +157,58 @@ def generate_automl_report(
     Returns:
         str: Path to the generated HTML report.
     """
+    is_valid, validated_data_obj = validate_report_data(results)
+
+    if not is_valid:
+        logger.error("Report data is not valid or complete. Report generation aborted.")
+        return None
+    if validated_data_obj:
+        validated_data: ReportData = validated_data_obj
+    else:
+        logger.error("Validated data object is None")
+        return None
+
+
+
     os.makedirs(output_dir, exist_ok=True)
 
-    timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    # Use the validated data's timestamp and project name, or defaults
+    # Generate a timestamp for the filename (without seconds/microseconds)
+    filename_timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M")
+
+    # Use the project name for the report, sanitized for use in filenames
+    sanitized_project_name = "".join(c for c in project_name if c.isalnum() or c in (' ', '-', '_')).rstrip()
+    if not sanitized_project_name:
+        sanitized_project_name = "Report"
+
+    # Generate filenames with timestamp
+    html_filename = f"automl_report_{sanitized_project_name}_{filename_timestamp}.html"
+    pdf_filename = f"automl_report_{sanitized_project_name}_{filename_timestamp}.pdf"
+
+    html_path = os.path.join(output_dir, html_filename)
+
+    # Use the existing timestamp from validated_data for the *content* of the report
+    timestamp = validated_data.timestamp
 
     template = Template(open("./template.html").read())
     html_content = template.render(
         project_name=project_name,
         timestamp=timestamp,
-        business_understanding=results.get("business_understanding"),
-        data_understanding=results.get("data_understanding"),
-        data_preparation=results.get("data_preparation"),
-        modeling=results.get("modeling"),
-        evaluation=results.get("evaluation"),
-        deployment=results.get("deployment"),
+        business_understanding=validated_data.business_understanding,
+        data_understanding=validated_data.data_understanding,
+        data_preparation=validated_data.data_preparation,
+        modeling=validated_data.modeling,
+        evaluation=validated_data.evaluation,
+        deployment=validated_data.deployment,
     )
 
-    html_path = os.path.join(output_dir, "automl_report.html")
     with open(html_path, "w", encoding="utf-8") as f:
         f.write(html_content)
 
     logger.info(f"HTML report saved to {html_path}")
 
     if save_pdf:
-        pdf_path = os.path.join(output_dir, "automl_report.pdf")
+        pdf_path = os.path.join(output_dir, pdf_filename)
         try:
             with open(html_path, "r", encoding="utf-8") as f:
                 pisa.CreatePDF(f.read(), dest=open(pdf_path, "wb"))

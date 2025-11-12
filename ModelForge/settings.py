@@ -14,8 +14,16 @@ class Settings(BaseSettings):
     # Строка с данными для подключения к data base
     DB_CONNECTION: str
     AIO_DB_CONNECTION: str
+    # Авторизация в KAGGLE
     KAGGLE_USERNAME: str
     KAGGLE_KEY: str
+    # Авторизация для настройки SMTP:
+    smtp_server: str
+    smtp_port: int
+    sender_email: str
+    sender_password: str
+    # Диреткория для хранения итоговых отчетов
+    reports_dir: str
 
 
 settings = Settings() #type:ignore

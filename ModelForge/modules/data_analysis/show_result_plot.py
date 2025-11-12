@@ -6,6 +6,8 @@ import seaborn as sns
 import pandas as pd
 import numpy as np
 
+from ModelForge.settings import settings
+
 logger = logging.getLogger(__name__)
 
 
@@ -373,7 +375,7 @@ def generate_all_plots(
         all_paths["residuals"] = plot_residuals(
             analysis_results["model_results"]["y_true"],
             analysis_results["model_results"]["y_pred"],
-            model_name,
+            model_name,  # type:ignore
             output_dir,
             save_format
         )

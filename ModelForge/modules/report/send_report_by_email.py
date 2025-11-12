@@ -7,14 +7,12 @@ from email.mime.base import MIMEBase
 from email import encoders
 from typing import List, Optional
 
+from ModelForge.settings import settings
+
 logger = logging.getLogger(__name__)
 
 
 def send_report_via_email(
-    smtp_server: str,
-    smtp_port: int,
-    sender_email: str,
-    sender_password: str,
     recipient_emails: List[str],
     subject: str,
     body: str,
@@ -42,6 +40,12 @@ def send_report_via_email(
         ValueError: If any required argument is missing or invalid.
         smtplib.SMTPException: If there is an issue with the SMTP server.
     """
+    # Заполнение данных для отправки из .env
+    smtp_server: str = settings.smtp_server
+    smtp_port: int = settings.smtp_port
+    sender_email: str = settings.sender_email
+    sender_password: str = settings.sender_password
+
     if not all([smtp_server, sender_email, sender_password, recipient_emails]):
         raise ValueError("SMTP server, sender credentials, and recipients must be provided.")
 
