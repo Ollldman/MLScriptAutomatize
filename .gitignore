@@ -26,6 +26,9 @@ pip-cache/
 *.egg-info/
 .installed.cfg
 *.egg-link
+# не выгружаем файлы логов и экспериментов
+*.log
+experiment*/
 
 # PyInstaller
 *.manifest

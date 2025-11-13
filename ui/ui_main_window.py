@@ -1,10 +1,9 @@
-# UI/ui_main_window.py
 from PyQt5.QtWidgets import (
     QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QLabel, QPushButton,
-    QStackedWidget, QFrame, QSizePolicy
+    QStackedWidget, QFrame, QSizePolicy, QScrollArea, QFileDialog
 )
 from PyQt5.QtCore import Qt, pyqtSignal
-from PyQt5.QtGui import QFont
+from PyQt5.QtGui import QFont, QIcon
 import sys
 import os
 
@@ -16,52 +15,63 @@ from ui.crisp_steps.step_4_modeling import Step4Modeling
 from ui.crisp_steps.step_5_evaluation import Step5Evaluation
 from ui.crisp_steps.step_6_deployment import Step6Deployment
 
+from ModelForge.modules.report.report_data import ReportData
+
 
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("ModelForge — Автоматизированный ML-анализ")
-        self.setGeometry(100, 100, 1000, 700)
-        self.setMinimumSize(800, 600)
+        self.shared_data = ReportData()
 
-        # ✅ Устанавливаем стеклянный фон только для этого окна, если нужно
-        # self.setAttribute(Qt.WA_TranslucentBackground, True)  # ❌ Убрали — вызывает CSS-предупреждения
+        self.setWindowTitle("📊 ModelForge — Автоматизированный ML-анализ")
+        self.setGeometry(100, 100, 1200, 750)
+        self.setMinimumSize(900, 600)
+
+        self.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground, True)
+        # Флаг состояния навигации
+        self.nav_collapsed = False
 
         # Центральный виджет
         central_widget = QWidget()
         self.setCentralWidget(central_widget)
         main_layout = QVBoxLayout(central_widget)
-        main_layout.setContentsMargins(20, 20, 20, 20)  # Отступы от краёв
-        main_layout.setSpacing(10)
-
-        # Заголовок
-        title_label = QLabel("📊 ModelForge — Автоматизированный ML-анализ")
-        title_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        title_label.setFont(QFont("Segoe UI", 18, QFont.Bold))
-        title_label.setStyleSheet("""
-            color: #f0f0f0;
-            padding: 20px;
-            background-color: rgba(50, 50, 60, 180);
-            border-radius: 12px;
-            margin: 0;
-        """)
-        main_layout.addWidget(title_label)
+        main_layout.setContentsMargins(0, 0, 0, 0)
+        main_layout.setSpacing(0)
 
         # Горизонтальный контейнер для навигации и контента
         content_layout = QHBoxLayout()
         main_layout.addLayout(content_layout)
 
-        # Боковая панель навигации
-        nav_frame = QFrame()
-        nav_frame.setFixedWidth(310)
-        nav_frame.setStyleSheet("""
-            background-color: rgba(40, 40, 50, 180);
-            border-right: 1px solid rgba(100, 100, 120, 0.5);
-            border-radius: 0 12px 12px 0;
-        """)
-        nav_layout = QVBoxLayout(nav_frame)
+        # === Боковая панель навигации ===
+        self.nav_frame = QFrame()
+        self.nav_frame.setFixedWidth(320)
+        self.nav_frame.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Expanding)
+        self.nav_frame.setObjectName("nav_frame")
+
+        nav_layout = QVBoxLayout(self.nav_frame)
+        nav_layout.setContentsMargins(10, 20, 10, 20)
         nav_layout.setSpacing(8)
-        nav_layout.setContentsMargins(15, 20, 15, 20)
+
+        # Кнопка сворачивания
+        self.toggle_nav_btn = QPushButton("◀▶")
+        self.toggle_nav_btn.setFixedHeight(60)
+        self.toggle_nav_btn.setFixedWidth(60)
+        self.toggle_nav_btn.setText("◀" if not self.nav_collapsed else "▶")
+        self.toggle_nav_btn.setStyleSheet("""
+            QPushButton {
+                background-color: rgba(138, 43, 226, 0.8);
+                color: white;
+                border-radius: 8px;
+                font-weight: bold;
+                padding: 5px;
+            }
+            QPushButton:hover {
+                background-color: rgba(255, 255, 255, 0.9);
+                color: black;
+            }
+        """)
+        self.toggle_nav_btn.clicked.connect(self.toggle_navigation)
+        nav_layout.addWidget(self.toggle_nav_btn)
 
         # Кнопки навигации
         self.nav_buttons = {}
@@ -73,6 +83,14 @@ class MainWindow(QMainWindow):
             ("5. Evaluation", Step5Evaluation),
             ("6. Deployment", Step6Deployment),
         ]
+        self.nav_button_texts = [
+            "1. Business Understanding",
+            "2. Data Understanding",
+            "3. Data Preparation", 
+            "4. Modeling",
+            "5. Evaluation",
+            "6. Deployment",
+        ]
 
         for step_name, step_class in steps:
             btn = QPushButton(step_name)
@@ -82,44 +100,109 @@ class MainWindow(QMainWindow):
             nav_layout.addWidget(btn)
             self.nav_buttons[step_name] = btn
 
-        content_layout.addWidget(nav_frame)
+        # Заполнитель внизу
+        nav_layout.addStretch()
 
-        # Стек для содержимого шагов
-        self.stacked_widget = QStackedWidget()
-        self.stacked_widget.setStyleSheet("""
-            background: transparent;
-            border-radius: 12px;
+        content_layout.addWidget(self.nav_frame)
+
+        # === Рабочая область с прокруткой ===
+        self.content_scroll = QScrollArea()
+        self.content_scroll.setWidgetResizable(True)
+        self.content_scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        self.content_scroll.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAsNeeded)
+        self.content_scroll.setStyleSheet("""
+            QScrollArea { border: none; background: transparent; }
+            QScrollBar:vertical {
+                border: none;
+                background: rgba(60, 60, 70, 150);
+                width: 8px;
+                margin: 0px;
+                border-radius: 4px;
+            }
+            QScrollBar::handle:vertical {
+                background: qlineargradient(x1:0, y1:0, x2:1, y2:1,
+                    stop:0 rgba(138, 43, 226, 0.7),
+                    stop:1 rgba(255, 20, 147, 0.7));
+                min-height: 20px;
+                border-radius: 4px;
+            }
+            QScrollBar::handle:vertical:hover {
+                background: qlineargradient(x1:0, y1:0, x2:1, y2:1,
+                    stop:0 rgba(138, 43, 226, 1),
+                    stop:1 rgba(255, 20, 147, 1));
+            }
+            QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {
+                height: 0px;
+            }
         """)
 
-        # Создаем экземпляры шагов
-        self.steps = {}
+        self.stacked_widget = QStackedWidget()
+        self.stacked_widget.setStyleSheet("background: transparent;")
         for step_name, step_class in steps:
-            step_instance = step_class()
-            self.steps[step_name] = step_instance
+            step_instance = step_class(self.shared_data)
             self.stacked_widget.addWidget(step_instance)
+            break
 
-        content_layout.addWidget(self.stacked_widget)
+        self.content_scroll.setWidget(self.stacked_widget)
+        content_layout.addWidget(self.content_scroll)
 
-        # Устанавливаем первый шаг как активный
-        self.current_step = 0
-        self.stacked_widget.setCurrentIndex(self.current_step)
-        self.nav_buttons["1. Business Understanding"].setChecked(True)
+        # === Заголовок ===
+        title_label = QLabel("📊 ModelForge — Автоматизированный ML-анализ")
+        title_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        title_label.setFont(QFont("Segoe UI", 23, QFont.Bold))
+        title_label.setStyleSheet("""
+            color: #f0f0ff;
+            padding: 15px;
+            background-color: rgba(50, 50, 60, 0.8);
+            border-radius: 12px;
+            margin: 10px;
+        """)
 
-        # Добавляем кнопку "Сохранить отчет" внизу
-        save_btn = QPushButton("💾 Сохранить отчет (PDF/HTML)")
+        main_layout.insertWidget(0, title_label)
+
+        # === Кнопка сохранения отчёта ===
+        save_btn = QPushButton("💾 Сохранить отчёт (PDF/HTML)")
         save_btn.setFixedHeight(40)
         save_btn.setStyleSheet("""
-            background-color: #2c3e50;
-            color: white;
-            border-radius: 8px;
-            font-weight: bold;
-            margin: 10px;
+            QPushButton {
+                background: qlineargradient(x1:0, y1:0, x2:1, y2:1,
+                    stop:0 #8B00FF, stop:1 #FF1493);
+                color: white;
+                border-radius: 10px;
+                font-weight: bold;
+                margin: 10px;
+                padding: 10px;
+                border: 1px solid rgba(255, 105, 180, 0.5);
+            }
+            QPushButton:pressed {
+                background: qlineargradient(x1:0, y1:0, x2:1, y2:1,
+                    stop:0 #7A00E6, stop:1 #DB00AA);
+            }
         """)
         save_btn.clicked.connect(self.on_save_report)
         main_layout.addWidget(save_btn, alignment=Qt.AlignmentFlag.AlignCenter)
 
+        # === Инициализация текущего шага ===
+        self.current_step = 0
+        self.stacked_widget.setCurrentIndex(self.current_step)
+        self.nav_buttons["1. Business Understanding"].setChecked(True)
+
+    def toggle_navigation(self):
+        if self.nav_collapsed:
+            self.nav_frame.setFixedWidth(320)
+            self.toggle_nav_btn.setText("◀▶")
+            for i, (step_name, btn) in enumerate(self.nav_buttons.items()):
+                btn.setText(self.nav_button_texts[i])
+                btn.setFixedWidth(260)  # Вернём ширину кнопки
+        else:
+            self.nav_frame.setFixedWidth(120)
+            self.toggle_nav_btn.setText("▶")
+            for i, (step_name, btn) in enumerate(self.nav_buttons.items()):
+                btn.setText(f"{i + 1}.")
+                btn.setFixedWidth(60)  # Узкая кнопка
+        self.nav_collapsed = not self.nav_collapsed
+
     def on_nav_click(self, step_name):
-        """Обработчик клика по кнопке навигации."""
         # Отключаем все кнопки
         for btn in self.nav_buttons.values():
             btn.setChecked(False)
@@ -128,17 +211,17 @@ class MainWindow(QMainWindow):
         self.nav_buttons[step_name].setChecked(True)
 
         # Получаем индекс шага
-        step_index = list(self.steps.keys()).index(step_name)
+        step_index = list(self.nav_buttons.keys()).index(step_name)
 
         # Проверяем, можно ли перейти на этот шаг
         if step_index > self.current_step:
-            # Пользователь пытается перейти вперёд — проверяем, выполнен ли предыдущий шаг
+            # Только если это следующий шаг
             if step_index == self.current_step + 1:
                 self.current_step = step_index
                 self.stacked_widget.setCurrentIndex(step_index)
             else:
-                # Попытка пропустить шаг — игнорируем
-                self.nav_buttons[list(self.steps.keys())[self.current_step]].setChecked(True)
+                # Нельзя пропускать шаги
+                self.nav_buttons[list(self.nav_buttons.keys())[self.current_step]].setChecked(True)
                 return
         else:
             # Переход назад — разрешён всегда
@@ -146,13 +229,21 @@ class MainWindow(QMainWindow):
             self.stacked_widget.setCurrentIndex(step_index)
 
     def on_save_report(self):
-        """Открывает диалог сохранения отчёта."""
+        """
+        Открывает диалог выбора директории для сохранения.
+        В будущем вызовет generate_automl_report.
+        """
         from PyQt5.QtWidgets import QMessageBox
+        folder = QFileDialog.getExistingDirectory(self, "Выберите папку для сохранения отчёта")
+        if not folder:
+            QMessageBox.information(self, "Сохранение", "Папка не выбрана.")
+            return
+
+        # ⚠️ Здесь будет вызов report_generator.generate_automl_report(...)
+        # Сейчас заглушка
         QMessageBox.information(
             self,
-            "Сохранение отчёта",
-            "Функция сохранения отчёта будет реализована на этапе 6.\n"
-            "Пока вы можете сохранить отчёт через файловый диалог.\n"
-            "Выберите папку для сохранения HTML и PDF файлов.",
-            QMessageBox.Ok
+            "Отчёт сохранён",
+            f"Файл отчёта будет сохранён в:\n{folder}\n\n"
+            "В реальной версии здесь будет генерация HTML/PDF."
         )
