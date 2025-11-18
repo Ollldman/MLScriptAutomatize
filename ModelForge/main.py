@@ -3,7 +3,7 @@ import sys
 import logging
 import pickle
 from datetime import datetime
-from typing import Dict, Any, Optional, List
+from typing import Dict, Any, Optional, List, Tuple
 import pandas as pd
 import numpy as np
 
@@ -24,6 +24,7 @@ from ModelForge.modules.data_analysis.gboost_models import xgb_run_classificatio
 from ModelForge.modules.report.report_generator import generate_automl_report
 from ModelForge.modules.report.report_data import ReportData
 from ModelForge.modules.report.send_report_by_email import send_report_via_email
+from ModelForge.integration.db_storage import save_results_to_db
 from ModelForge.settings import settings
 
 def clear_screen():
@@ -46,7 +47,7 @@ def setup_experiment_directories():
     
     return directories, timestamp
 
-def select_data_source() -> Dict[str, Any]:
+def select_data_source() -> Tuple[Dict[str, Any], str]:
     """Interactive data source selection"""
     print("### DATA LOADING ###")
     print("Select data source:")
@@ -57,43 +58,45 @@ def select_data_source() -> Dict[str, Any]:
     print("5. Hugging Face Dataset")
     print("6. UCI Dataset")
     print("7. Sklearn Built-in Dataset")
+
+    dataset_name: str = input("Enter dataset name: ")
     
     choice = input("Enter choice (1-7): ").strip()
     
     if choice == "1":
         file_path = input("Enter CSV file path: ").strip()
-        return {"source": "csv", "path": file_path}
+        return {"source": "csv", "path": file_path}, dataset_name
     
     elif choice == "2":
         file_path = input("Enter Excel file path: ").strip()
         sheet_name = input("Enter sheet name (optional, press Enter for default): ").strip()
-        return {"source": "excel", "path": file_path, "sheet_name": sheet_name or 0}
+        return {"source": "excel", "path": file_path, "sheet_name": sheet_name or 0}, dataset_name
     
     elif choice == "3":
         connection_string = input("Enter database connection string: ").strip()
         sql_query = input("Enter SQL query: ").strip()
-        return {"source": "database", "connection_string": connection_string, "sql_query": sql_query}
+        return {"source": "database", "connection_string": connection_string, "sql_query": sql_query}, dataset_name
     
     elif choice == "4":
         dataset_id = input("Enter Kaggle dataset ID (format: username/dataset-name): ").strip()
         filename = input("Enter filename within dataset: ").strip()
-        return {"source": "kaggle", "dataset_id": dataset_id, "filename": filename}
+        return {"source": "kaggle", "dataset_id": dataset_id, "filename": filename}, dataset_name
     
     elif choice == "5":
         dataset_id = input("Enter Hugging Face dataset ID: ").strip()
-        return {"source": "huggingface", "dataset_id": dataset_id}
+        return {"source": "huggingface", "dataset_id": dataset_id}, dataset_name
     
     elif choice == "6":
         dataset_id = input("Enter UCI dataset ID (number): ").strip()
-        return {"source": "uci", "dataset_id": int(dataset_id)}
+        return {"source": "uci", "dataset_id": int(dataset_id)}, dataset_name
     
     elif choice == "7":
         dataset_name = input("Enter sklearn dataset name (e.g., load_iris): ").strip()
-        return {"source": "sklearn", "name": dataset_name}
+        return {"source": "sklearn", "name": dataset_name}, dataset_name
     
     else:
         print("Invalid choice. Using Iris dataset as default.")
-        return {"source": "sklearn", "name": "load_iris"}
+        return {"source": "sklearn", "name": "load_iris"}, dataset_name
 
 def load_data(source_config: Dict[str, Any]) -> Optional[pd.DataFrame]:
     """Load data based on source configuration"""
@@ -103,9 +106,9 @@ def load_data(source_config: Dict[str, Any]) -> Optional[pd.DataFrame]:
         if source == "csv":
             return load_from_csv(source_config["path"])
         elif source == "excel":
-            return load_from_excel(source_config["path"], source_config.get("sheet_name", 0))
+            return load_from_excel(source_config["path"], source_config.get("sheet_name", 0)) #type:ignore
         elif source == "database":
-            return async_sql_to_df(source_config["connection_string"], source_config["sql_query"])
+            return async_sql_to_df(source_config["connection_string"], source_config["sql_query"]) #type:ignore
         elif source == "kaggle":
             return load_dataset('kaggle', dataset_id=source_config["dataset_id"], 
                               filename=source_config["filename"])
@@ -266,8 +269,7 @@ def main():
         logger.info(f"Business understanding - Success metric: {report_data.business_understanding['success_metric']}")
         
         ### STEP 2: DATA LOADING ###
-        clear_screen()
-        source_config = select_data_source()
+        source_config, dataset_name = select_data_source()
         df = load_data(source_config)
         
         if df is None or df.empty:
@@ -278,7 +280,6 @@ def main():
         logger.info(f"Data loaded successfully from {source_config['source']}. Shape: {df.shape}")
         
         ### STEP 3: DATA UNDERSTANDING ###
-        clear_screen()
         print("### DATA UNDERSTANDING ###")
         
         # Show basic info
@@ -351,7 +352,7 @@ def main():
         dedup_result = remove_duplicate_rows(df_clean)
         if dedup_result.status == "success":
             df_clean = pd.DataFrame(dedup_result.cleaned_dataframe)
-            print(f"Removed {len(dedup_result.removed_duplicates)} duplicate rows")
+            print(f"Removed {len(dedup_result.removed_duplicates)} duplicate rows") # type:ignore
         
         # Encode categorical features
         print("Encoding categorical features...")
@@ -513,6 +514,18 @@ def main():
             print("✓ Report data validation: COMPLETE")
         else:
             print("⚠ Report data validation: INCOMPLETE (missing required sections)")
+
+        # save to db
+        logger.info("Step 9: Save to DB (to be implemented)")
+        logger.info("Saving results to DB...")
+        save_results_to_db(
+            model_name=model_results["best_estimator"].__class__.__name__,
+            dataset_name=dataset_name,
+            metrics=model_results["test_metrics"],
+            best_params=model_results["best_params"]
+        )
+
+        logger.info("Pipeline completed successfully.")
         
     except Exception as e:
         logging.error(f"Experiment failed: {e}", exc_info=True)
