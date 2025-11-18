@@ -237,7 +237,7 @@ def main():
     
     # Set matplotlib to only show warnings and errors
     import matplotlib
-    matplotlib.set_loglevel('warning')  # Это специально для matplotlib
+    matplotlib.set_loglevel('warning')
     
     # Также через logging
     import logging
@@ -333,7 +333,6 @@ def main():
         logger.info(f"Missing values report: {missing_report}")
         
         ### STEP 4: DATA PREPARATION ###
-        clear_screen()
         print("### DATA PREPARATION ###")
         
         # Select target column
@@ -384,7 +383,6 @@ def main():
         logger.info(f"Final dataset shape: {df_clean.shape}")
         
         ### STEP 5: MODELING ###
-        clear_screen()
         print("### MODELING ###")
         
         # Prepare features and target
@@ -456,7 +454,6 @@ def main():
         logger.info("Model evaluation completed successfully")
         
         ### STEP 7: DEPLOYMENT & REPORTING ###
-        clear_screen()
         print("### DEPLOYMENT & REPORTING ###")
         
         # Generate report using the validated ReportData structure
